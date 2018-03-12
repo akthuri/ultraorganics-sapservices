@@ -60,7 +60,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="elaboraciones.svc" />
-    <Content Include="Service1.svc" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -70,10 +69,6 @@
     <Compile Include="model\ElaboracionPartidaVO.cs" />
     <Compile Include="model\ElaboracionVO.cs" />
     <Compile Include="model\ResultadoVO.cs" />
-    <Compile Include="Service1.svc.cs">
-      <DependentUpon>Service1.svc</DependentUpon>
-    </Compile>
-    <Compile Include="IService1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="services\DocumentoService.cs" />
     <Compile Include="services\DocumentoVO.cs" />
