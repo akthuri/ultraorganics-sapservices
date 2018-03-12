@@ -71,7 +71,7 @@
     <Compile Include="model\ResultadoVO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="services\DocumentoService.cs" />
-    <Compile Include="services\DocumentoVO.cs" />
+    <Compile Include="model\DocumentoVO.cs" />
     <Compile Include="services\ElaboracionService.cs" />
   </ItemGroup>
   <ItemGroup>
