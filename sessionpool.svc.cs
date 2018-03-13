@@ -6,14 +6,13 @@ using System.ServiceModel;
 using System.ServiceModel.Activation;
 using System.ServiceModel.Web;
 using System.Text;
-using UltraorganicsWS.model;
 using UltraorganicsWS.services;
 
 namespace UltraorganicsWS
 {
     [ServiceContract(Namespace = "")]
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
-    public class elaboraciones
+    public class sessionpool
     {
         // To use HTTP GET, add [WebGet] attribute. (Default ResponseFormat is WebMessageFormat.Json)
         // To create an operation that returns XML,
@@ -21,25 +20,22 @@ namespace UltraorganicsWS
         //     and include the following line in the operation body:
         //         WebOperationContext.Current.OutgoingResponse.ContentType = "text/xml";
         [OperationContract]
-        public ResultadoVO crearElaboracion(ElaboracionVO elaboracion)
+        [WebGet]
+        public SessionMetrics status()
         {
-            ElaboracionService elaboracionService = new ElaboracionService();
-            ResultadoVO resultadoVO = new ResultadoVO();
-            
-            try
-            {
-                resultadoVO = elaboracionService.crearDocumento(elaboracion);
-            }
-            catch (Exception ex)
-            {
-                resultadoVO.Success = false;
-                resultadoVO.DocEntry = 0;
-                resultadoVO.Mensaje = ex.Message;
-            }
+            SessionMetrics metrics = SessionPool.GetMetrics();
 
-            return resultadoVO;
+            return metrics;
         }
 
-        // Add more operations here and mark them with [OperationContract]
+        [OperationContract]
+        [WebGet]
+        public String refresh()
+        {
+            int sesionesMuertas = SessionPool.Refresh();
+
+            return "Sesiones recuperadas: " + sesionesMuertas;
+        }
+
     }
 }

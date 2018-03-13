@@ -58,16 +58,8 @@ namespace UltraorganicsWS.services
 
         public ResultadoVO crearDocumento(DocumentoVO documento)
         {
-            Conectar();
-
-            if (company.Connected == false)
-            {
-                resultadoVO = new ResultadoVO();
-                resultadoVO.Success = false;
-                resultadoVO.Mensaje = mensajeError;
-
-                return resultadoVO;
-            }
+            Sesion sesion = SessionPool.getSession();
+            this.company = sesion.company;
 
             this.documentoVO = documento;
 
@@ -89,7 +81,7 @@ namespace UltraorganicsWS.services
                 throw e;
             }            
 
-            Desconectar();
+            sesion.Close();
 
             return this.resultadoVO;
         }

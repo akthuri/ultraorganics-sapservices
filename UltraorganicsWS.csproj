@@ -39,6 +39,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Handlebars, Version=1.8.1.0, Culture=neutral, PublicKeyToken=22225d0bf33cd661, processorArchitecture=MSIL">
+      <HintPath>packages\Handlebars.Net.1.9.0\lib\net40\Handlebars.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>dependencias\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -59,12 +67,18 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="dependencias\log4net.dll" />
     <Content Include="elaboraciones.svc" />
+    <Content Include="Global.asax" />
+    <Content Include="sessionpool.svc" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="elaboraciones.svc.cs">
       <DependentUpon>elaboraciones.svc</DependentUpon>
+    </Compile>
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="model\ElaboracionPartidaVO.cs" />
     <Compile Include="model\ElaboracionVO.cs" />
@@ -73,11 +87,18 @@
     <Compile Include="services\DocumentoService.cs" />
     <Compile Include="model\DocumentoVO.cs" />
     <Compile Include="services\ElaboracionService.cs" />
+    <Compile Include="services\Sesion.cs" />
+    <Compile Include="services\SessionMetrics.cs" />
+    <Compile Include="services\SessionPool.cs" />
+    <Compile Include="sessionpool.svc.cs">
+      <DependentUpon>sessionpool.svc</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

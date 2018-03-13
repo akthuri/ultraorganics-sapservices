@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using log4net;
 using SAPbobsCOM;
 using UltraorganicsWS.model;
 
@@ -14,6 +15,8 @@ namespace UltraorganicsWS.services
     /// </summary>
     public class ElaboracionService : DocumentoService
     {
+        private static ILog log = LogManager.GetLogger(typeof(ElaboracionService));
+
         private const int BASETYPE_ORDEN_PRODUCCION = 202;
         private ElaboracionVO elaboracionVO;
         private string _docEntryOf = "";
@@ -25,16 +28,21 @@ namespace UltraorganicsWS.services
         {
             this.elaboracionVO = (ElaboracionVO)this.documentoVO;
 
+            log.Debug(elaboracionVO);
+
             bool error = false;
+            int PrimerDocNum = 0;
             foreach (ElaboracionPartidaVO itemVO in elaboracionVO.partidas)
             {
-                int docEntry = CrearOrden(itemVO, elaboracionVO.WhsCode);
+                int docEntry = CrearOrden(itemVO, elaboracionVO.whsCode);
 
                 if (docEntry == -1)
                 {
                     error = true;
                     break;
                 }
+
+                if (PrimerDocNum == 0) PrimerDocNum = this.resultadoVO.DocNum;
 
                 RecibirProductoTerminado(docEntry);
                 if (resultadoVO.Success == false)
@@ -52,7 +60,7 @@ namespace UltraorganicsWS.services
                 this.resultadoVO.Success = true;
                 this.resultadoVO.Mensaje = "";
                 this.resultadoVO.DocEntry = 0;
-                this.resultadoVO.DocNum = 0;
+                this.resultadoVO.DocNum = PrimerDocNum;
             }
         }
 
@@ -62,9 +70,9 @@ namespace UltraorganicsWS.services
             ProductionOrders order = (ProductionOrders)company.GetBusinessObject(BoObjectTypes.oProductionOrders);
 
             order.Warehouse = codigoAlmacen;
-            order.ItemNo = itemVO.ItemCode;
+            order.ItemNo = itemVO.itemCode;
             order.DueDate = DateTime.Today;
-            order.PlannedQuantity = itemVO.Cantidad;
+            order.PlannedQuantity = itemVO.cantidad;
             String referencia = "Generado desde el Portal";
             order.Remarks = referencia;
             order.JournalRemarks = referencia;
@@ -76,6 +84,7 @@ namespace UltraorganicsWS.services
 
                 order.GetByKey(docEntry);
                 order.ProductionOrderStatus = BoProductionOrderStatusEnum.boposReleased;
+                this.resultadoVO.DocNum = order.DocumentNumber;
 
                 this._docEntryOf = strDocEntry;
                 this._docNumOf = order.DocumentNumber.ToString();
@@ -111,16 +120,13 @@ namespace UltraorganicsWS.services
             reciboProduccion.Lines.BaseType = BASETYPE_ORDEN_PRODUCCION;
             reciboProduccion.Lines.BaseEntry = docEntryOrden;
 
-            if (reciboProduccion.Add() == 0)
+            ObtenerResultado(reciboProduccion.Add() == 0);
+            if (this.resultadoVO.Success)
             {
                 string docEntry = company.GetNewObjectKey();
                 reciboProduccion.GetByKey(int.Parse(docEntry));
                 _docEntryRp = docEntry;
                 _docNumRp = reciboProduccion.DocNum.ToString();
-            }
-            else
-            {
-                raiseError();
             }
         } // RecibirProductoTerminado
 
