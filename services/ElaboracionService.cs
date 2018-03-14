@@ -32,8 +32,11 @@ namespace UltraorganicsWS.services
 
             bool error = false;
             int PrimerDocNum = 0;
+
+            log.Debug("Partidas en la elaboracion: " + elaboracionVO.partidas.Count);
             foreach (ElaboracionPartidaVO itemVO in elaboracionVO.partidas)
             {
+                log.Debug("Creando Orden de Fabricacion");
                 int docEntry = CrearOrden(itemVO, elaboracionVO.whsCode);
 
                 if (docEntry == -1)
@@ -44,6 +47,7 @@ namespace UltraorganicsWS.services
 
                 if (PrimerDocNum == 0) PrimerDocNum = this.resultadoVO.DocNum;
 
+                log.Debug("Recibir Producto Terminado");
                 RecibirProductoTerminado(docEntry);
                 if (resultadoVO.Success == false)
                 {
@@ -51,6 +55,7 @@ namespace UltraorganicsWS.services
                     break;
                 }
 
+                log.Debug("Cerrar Orden de Fabricacion");
                 CerrarOrdenFabricacion(docEntry);
             }
 
@@ -62,6 +67,8 @@ namespace UltraorganicsWS.services
                 this.resultadoVO.DocEntry = 0;
                 this.resultadoVO.DocNum = PrimerDocNum;
             }
+
+            log.Debug(this.resultadoVO);
         }
 
         private int CrearOrden(ElaboracionPartidaVO itemVO, String codigoAlmacen)

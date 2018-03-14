@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Web;
+using log4net;
 using SAPbobsCOM;
 using UltraorganicsWS.model;
 
@@ -14,6 +15,8 @@ namespace UltraorganicsWS.services
     /// </summary>
     public abstract class DocumentoService
     {
+        private static ILog log = LogManager.GetLogger(typeof(DocumentoService));
+
         protected ResultadoVO resultadoVO = null;
         protected DocumentoVO documentoVO = null;
         protected SAPbobsCOM.Company company = null;
@@ -29,41 +32,15 @@ namespace UltraorganicsWS.services
             resultadoVO.DocNum = 0;
 	    }
 
-        private void Conectar()
-        {
-            if (company == null)
-            {
-                company = new SAPbobsCOM.Company();
-            }
-
-            company.DbServerType = SAPbobsCOM.BoDataServerTypes.dst_MSSQL2012;
-            company.Server = ConfigurationManager.AppSettings["DBServer"];
-            company.DbUserName = ConfigurationManager.AppSettings["DBUserName"];
-            company.DbPassword = ConfigurationManager.AppSettings["DBPassword"];
-            company.CompanyDB = ConfigurationManager.AppSettings["CompanyDB"];
-            company.UseTrusted = false;
-
-            company.LicenseServer = ConfigurationManager.AppSettings["LicenseServer"];
-            company.UserName = ConfigurationManager.AppSettings["SAPUserName"];
-            company.Password = ConfigurationManager.AppSettings["SAPPassword"];
-
-            company.language = BoSuppLangs.ln_Spanish_La;
-
-            if (company.Connect() != 0)
-            {
-                this.mensajeError = company.GetLastErrorDescription();
-            }
-
-        } // Conectar
-
         public ResultadoVO crearDocumento(DocumentoVO documento)
         {
             Sesion sesion = SessionPool.getSession();
-            this.company = sesion.company;
 
+            this.company = sesion.company;
             this.documentoVO = documento;
 
-            company.StartTransaction();
+            // TODO: intentar habilitar transacciones nuevamente
+            // company.StartTransaction();
             try
             {
                 CrearDocumentoSAP();
@@ -77,11 +54,14 @@ namespace UltraorganicsWS.services
             catch (Exception e)
             {
                 if (company.InTransaction) company.EndTransaction(BoWfTransOpt.wf_RollBack);
-                Console.WriteLine(e);
-                throw e;
-            }            
-
-            sesion.Close();
+                log.Error(e);
+                this.resultadoVO.Success = false;
+                this.resultadoVO.Mensaje = e.Message;
+            }
+            finally
+            {
+                sesion.Close();
+            }
 
             return this.resultadoVO;
         }

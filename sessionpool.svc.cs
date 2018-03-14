@@ -37,5 +37,12 @@ namespace UltraorganicsWS
             return "Sesiones recuperadas: " + sesionesMuertas;
         }
 
+        [OperationContract]
+        [WebGet]
+        public SessionMetrics reiniciar()
+        {
+            return SessionPool.Reiniciar();
+        }
+
     }
 }

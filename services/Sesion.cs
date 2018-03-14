@@ -8,12 +8,13 @@ namespace UltraorganicsWS.services
 {
     public class Sesion
     {
-        public int index = -1;
+        public Guid uui = Guid.NewGuid();
+        public DateTime born = DateTime.Now;
         public Company company = null;
 
         public void Close()
         {
-            SessionPool.DevolverSesion(index);
+            SessionPool.DevolverSesion(uui);
         }
     }
 }

@@ -19,7 +19,7 @@ namespace UltraorganicsWS
             // Iniciar el logger
             XmlConfigurator.Configure();
 
-            log.Info("Iniciando Servicios Ultraorganics");
+            log.Info("Iniciando Servicios");
 
             // Iniciar el pool de sesiones SAP
             SessionPool.Init();
